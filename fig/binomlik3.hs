@@ -84,7 +84,7 @@ fsTitle = def { _font_size = 10,
                 _font_slant = FontSlantItalic }
 
 outputFile :: (FileOptions, String)
--- outputFile = (FileOptions (800,500) PNG, "binomlik3_fig.png")
+-- outputFile = (FileOptions (1000,500) PNG, "binomlik3_fig.png")
 outputFile = (FileOptions (500,250) PDF, "binomlik3_fig.pdf")
 -- outputFile = (FileOptions (400,250) PS, "binomlik3_fig.ps")
 
