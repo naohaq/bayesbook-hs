@@ -37,7 +37,7 @@ xlabels = map (\(x,y)->(pb x,y)) ls
   where ls = [(0.0001,"0.0001"),(0.001,"0.001"),(0.01,"0.01"),(0.1,"0.1"),(0.5,"0.5"),(0.9,"0.9"),(0.99,"0.99")]
 
 logitAxis :: (RealFloat a) => AxisFn a
-logitAxis _ = ad { _axis_ticks = map (\(x,y)->(x,-y)) (_axis_ticks ad) }
+logitAxis _ = ad
   where ad = makeAxis' realToFrac realToFrac (map (const [])) (lvs,tvs,gvs)
         lvs = map fst xlabels
         tvs = lvs
@@ -51,6 +51,9 @@ line' w title values = liftEC $ do
     plot_lines_style . line_width .= w
     plot_lines_style . line_color .= color
 
+dropDownTicks :: AxisData x -> AxisData x
+dropDownTicks ad = ad { _axis_ticks = map (\(x,y)->(x,-y)) (_axis_ticks ad) }
+
 setLayout :: (RealFloat x) => EC (Layout x y) ()
 setLayout = do
     layout_title .= []
@@ -61,7 +64,7 @@ setLayout = do
     layout_y_axis . laxis_override .= axisLabelsOverride [] . axisGridHide
     -- x axis grid and ticks
     layout_x_axis . laxis_generate .= logitAxis
-    layout_x_axis . laxis_override .= axisLabelsOverride xlabels
+    layout_x_axis . laxis_override .= dropDownTicks . axisLabelsOverride xlabels
     layout_x_axis . laxis_style . axis_line_style .= solidLine 0.5 (opaque black)
     layout_x_axis . laxis_style . axis_grid_style .= dashedLine 0.5 [3,3] (opaque lightgrey)
     -- x axis labels
