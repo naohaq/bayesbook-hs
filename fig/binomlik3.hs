@@ -2,18 +2,13 @@
 
 module Main where
 
+import Common
+
 import Numeric (showFFloat)
-import qualified Numeric.SpecFunctions as N
 import Numeric.Tools.Integration
 
 import Graphics.Rendering.Chart.Easy
 import Graphics.Rendering.Chart.Backend.Cairo
-
-dbeta :: Double -> Double -> Double -> Double
-dbeta a b x = exp $ c + (a - 1) * lp + (b - 1) * lq
-  where c = - N.logBeta a b
-        lp = log x
-        lq = log (1 - x)
 
 pb :: (RealFloat a) => a -> a
 pb x = log (x / (1-x))
@@ -43,17 +38,6 @@ logitAxis _ = ad
         tvs = lvs
         gvs = take 9 $ tail lvs
 
-line' :: Double -> String -> [[(x,y)]] -> EC l (PlotLines x y)
-line' w title values = liftEC $ do
-    color <- takeColor
-    plot_lines_title .= title
-    plot_lines_values .= values
-    plot_lines_style . line_width .= w
-    plot_lines_style . line_color .= color
-
-dropDownTicks :: AxisData x -> AxisData x
-dropDownTicks ad = ad { _axis_ticks = map (\(x,y)->(x,-y)) (_axis_ticks ad) }
-
 setLayout :: (RealFloat x) => EC (Layout x y) ()
 setLayout = do
     layout_title .= []
@@ -63,8 +47,8 @@ setLayout = do
     layout_left_axis_visibility . axis_show_ticks .= False
     layout_y_axis . laxis_override .= axisLabelsOverride [] . axisGridHide
     -- x axis grid and ticks
-    layout_x_axis . laxis_generate .= logitAxis
-    layout_x_axis . laxis_override .= dropDownTicks . axisLabelsOverride xlabels
+    layout_x_axis . laxis_generate .= dropDownTicks . logitAxis
+    layout_x_axis . laxis_override .= axisLabelsOverride xlabels
     layout_x_axis . laxis_style . axis_line_style .= solidLine 0.5 (opaque black)
     layout_x_axis . laxis_style . axis_grid_style .= dashedLine 0.5 [3,3] (opaque lightgrey)
     -- x axis labels
@@ -84,8 +68,8 @@ fsTitle = def { _font_size = 10,
                 _font_slant = FontSlantItalic }
 
 outputFile :: (FileOptions, String)
--- outputFile = (FileOptions (1000,500) PNG, "binomlik3_fig.png")
-outputFile = (FileOptions (500,250) PDF, "binomlik3_fig.pdf")
+-- outputFile = (FileOptions (1175,600) PNG, "binomlik3_fig.png")
+outputFile = (FileOptions (590,300) PDF, "binomlik3_fig.pdf")
 -- outputFile = (FileOptions (400,250) PS, "binomlik3_fig.ps")
 
 main :: IO ()
