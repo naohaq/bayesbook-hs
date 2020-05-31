@@ -76,7 +76,7 @@ main :: IO ()
 main = toFile (fst outputFile) (snd outputFile) $ do
     setLayout
     setColors $ repeat (opaque black)
-    let n = 8192
+    let n = 1024
     mapM_ (\k -> plot (line' 0.5 "" [curve n k])) [1..5]
 
 -- EOF
