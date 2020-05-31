@@ -9,31 +9,17 @@ import Numeric (showFFloat)
 import Graphics.Rendering.Chart.Easy
 import Graphics.Rendering.Chart.Backend.Cairo
 
-pb :: (RealFloat a) => a -> a
-pb x = 2 / pi * asin (sqrt x)
-
-qb :: (RealFloat a) => a -> a
-qb z = sin (pi*z/2) ^ 2
-
 curve :: Int -> Double -> [(Double,Double)]
 curve n j = map f [0..n]
   where h = 1 / fromIntegral n
-        g = dbeta (j+1) (11-j) . qb
+        g = dbeta (j+0.5) (10.5-j)
         f k = (x, g x)
           where x = h * fromIntegral k
 
-xlabels :: (RealFloat a) => [(a,String)]
-xlabels = [(pb 0, "0")] ++ (map (f . (/ 10) . fromIntegral) [1..9]) ++ [(pb 1, "1")]
-  where f x = (pb x, showFFloat (Just 1) x "")
+axisGridAt :: [x] -> AxisData x -> AxisData x
+axisGridAt gvs ad = ad { _axis_grid = gvs }
 
-jeffreysAxis :: (RealFloat a) => AxisFn a
-jeffreysAxis _ = ad
-  where ad = makeAxis' realToFrac realToFrac (map (const [])) (lvs,tvs,gvs)
-        lvs = map fst xlabels
-        tvs = lvs
-        gvs = [pb 0.2]
-
-setLayout :: (RealFloat x) => EC (Layout x y) ()
+setLayout :: (Show x, RealFloat x) => EC (Layout x y) ()
 setLayout = do
     layout_title .= []
     layout_legend .= Nothing
@@ -42,10 +28,11 @@ setLayout = do
     layout_left_axis_visibility . axis_show_ticks .= False
     layout_y_axis . laxis_override .= axisLabelsOverride [] . axisGridHide
     -- x axis grid and ticks
-    layout_x_axis . laxis_generate .= dropDownTicks . jeffreysAxis
-    layout_x_axis . laxis_override .= axisLabelsOverride xlabels
+    let lpar = def { _la_nLabels = 6, _la_nTicks = 11 }
+    layout_x_axis . laxis_generate .= dropDownTicks . scaledAxis lpar (0,1)
+    layout_x_axis . laxis_override .= axisGridAt [1/6]
     layout_x_axis . laxis_style . axis_line_style .= solidLine 0.5 (opaque black)
-    layout_x_axis . laxis_style . axis_grid_style .= dashedLine 0.5 [3,3] (opaque black)
+    layout_x_axis . laxis_style . axis_grid_style .= dashedLine 0.5 [2,2] (opaque black)
     -- x axis labels
     layout_x_axis . laxis_style . axis_label_gap .= 7
     layout_x_axis . laxis_style . axis_label_style .= fsXLabel
@@ -63,8 +50,8 @@ fsTitle = def { _font_size = 10,
                 _font_slant = FontSlantItalic }
 
 outputFile :: (FileOptions, String)
--- outputFile = (FileOptions (800,500) PNG, "betamode2_fig.png")
-outputFile = (FileOptions (400,250) PDF, "betamode2_fig.pdf")
+-- outputFile = (FileOptions (800,500) PNG, "betamode1_fig.png")
+outputFile = (FileOptions (400,250) PDF, "betamode1_fig.pdf")
 
 main :: IO ()
 main = toFile (fst outputFile) (snd outputFile) $ do
