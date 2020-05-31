@@ -59,3 +59,5 @@ main = toFile (fst outputFile) (snd outputFile) $ do
     setColors $ repeat (opaque black)
     let n = 1024
     plot (line' 0.5 "" [curve n 2])
+
+-- EOF

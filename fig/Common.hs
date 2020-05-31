@@ -2,6 +2,8 @@
 
 module Common
   ( dbeta
+  , qbeta
+  , pbeta
   , line'
   , dropDownTicks )
 where
@@ -10,6 +12,12 @@ import qualified Numeric.SpecFunctions as N
 
 import Graphics.Rendering.Chart.Easy
 import Graphics.Rendering.Chart.Backend.Cairo
+
+pbeta :: Double -> Double -> Double -> Double
+pbeta a b = N.incompleteBeta a b
+
+qbeta :: Double -> Double -> Double -> Double
+qbeta a b = N.invIncompleteBeta a b
 
 dbeta :: Double -> Double -> Double -> Double
 dbeta a b x = exp $ c + (a - 1) * lp + (b - 1) * lq
